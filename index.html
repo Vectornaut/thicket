@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+
+<!--
+  using Material dark theme palette recommendations
+  https://www.material.io/design/color/dark-theme.html
+-->
+
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <script type="text/javascript" src="../p5.min.js"></script>
+  <script type="text/javascript" src="thicket.js"></script>
+  
+  <style>
+    * {
+      color: #dedede;
+      background-color: #121212;
+      font-family: Arial, sans-serif;
+    }
+    
+    a, a:active, a:visited {
+      color: #999999;
+    }
+    
+    div {
+      margin-top: 60px;
+    }
+    
+    #wrapper {
+      margin-left: 120px;
+      margin-bottom: 60px;
+    }
+    
+    #thicket {
+      margin-right: 120px;
+      display: inline-block;
+      border-top: 1px solid #969696;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="wrapper">
+    <div><b>Thicket.</b> A meditation on speciation, evolution, and extinction.</div>
+    <div id="thicket"></div>
+    <div>This is the family tree of a single cell, branching downward through the generations. Each new cell descends from one of its neighbors in the last generation. A coin flip decides whether it descends from the left or from the right. It inherits its ancestor&rsquo;s color, often with a little drift. A little drift adds up over time. As the colors become more vivid, your eyes might start to group them. You&rsquo;ll tend to see group boundaries where neighboring cells&rsquo; lineages have been separated for a long time. If you watch a group for long enough, you&rsquo;ll see its color drift as new variants spread through it. It will eventually either shrink to nothing or expand and diversify into many groups. Color has no effect on branching; all variation is <a href="https://www.quantamagazine.org/how-neutral-theory-altered-ideas-about-biodiversity-20201208/" target="_blank" rel="noopener noreferrer">neutral</a>.</div>
+  </div>
+</body>
+</html>

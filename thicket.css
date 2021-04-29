@@ -1,0 +1,24 @@
+* {
+  color: #dedede;
+  background-color: #121212;
+  font-family: Arial, sans-serif;
+}
+
+a, a:active, a:visited {
+  color: #999999;
+}
+
+div {
+  margin-top: 60px;
+}
+
+#wrapper {
+  margin-left: 120px;
+  margin-bottom: 60px;
+}
+
+#thicket {
+  margin-right: 120px;
+  display: inline-block;
+  border-top: 1px solid #969696;
+}

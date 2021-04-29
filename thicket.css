@@ -1,4 +1,4 @@
-* {
+body {
   color: #dedede;
   background-color: #121212;
   font-family: Arial, sans-serif;
@@ -11,6 +11,60 @@ a, a:active, a:visited {
 div {
   margin-top: 60px;
 }
+
+/* navigation bar */
+
+#navbar {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
+  background-color: #550044;
+}
+
+#navbar ul {
+  display: flex;
+  flex-direction: row;
+  overflow-x: scroll;
+  list-style-type: none;
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
+}
+
+#navbar li {
+  float: left;
+  vertical-align: text-bottom;
+}
+
+#navbar li a {
+  display: block;
+  white-space: nowrap;
+  padding: 6px 12px 8px 12px;
+  text-align: center;
+  color: white;
+  text-decoration: none;
+}
+
+#navbar li a:hover {
+  background-color: #999999;
+}
+
+#navbar .here {
+  background-color: #999999;
+}
+
+#navbar .title {
+  display: inline-block;
+  white-space: nowrap;
+  vertical-align: text-bottom;
+  margin: 0 30px 0 30px;
+  padding: 6px 0 8px 0;
+  font-size: 18pt;
+  font-weight: bold;
+}
+
+/* content div */
 
 #wrapper {
   margin-left: 120px;

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+
+<!--
+  using Material dark theme palette recommendations
+  https://www.material.io/design/color/dark-theme.html
+-->
+
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <link rel="stylesheet" type="text/css" href="thicket.css" />
+  
+  <script type="text/javascript" src="../p5.min.js"></script>
+  <script type="text/javascript" src="thicket.js"></script>
+</head>
+
+<body>
+  <div id="navbar">
+    <div class="title">Visualizing neutral theory</div>
+    <ul>
+      <li><a href="index.html">Title</a></li>
+      <li><a href="descent.html">Descent</a></li>
+      <li><a class="here" href="mutation.html">Mutation</a></li>
+      <li><a href="coalescence.html">Coalescence</a></li>
+      <li><a href="persistence.html">Persistence</a></li>
+      <li><a href="correlation.html">Correlation</a></li>
+      <li><a>Placeholder</a></li>
+      <li><a>Placeholder</a></li>
+      <li><a>Placeholder</a></li>
+      <li><a>Placeholder</a></li>
+      <li><a>Placeholder</a></li>
+      <li><a>Placeholder</a></li>
+      <li><a>Placeholder</a></li>
+      <li><a>Placeholder</a></li>
+    </ul>
+  </div>
+  <div id="wrapper">
+    <div>Cells come in two colors: dark and light. Each new cell inherits its ancestor&rsquo;s color&mdash;unless a mutation flips it. Use the slider below to vary the mutation rate. On this page, you can also click a column to mutate the next cell born there.</div>
+    <div id="thicket"></div>
+  </div>
+</body>
+</html>

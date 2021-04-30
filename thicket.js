@@ -159,20 +159,13 @@ function varyColor(c) {
   }
 }
 
-const nSegs = 2;
-
-function gradLine(x1, y1, c1, x2, y2, c2) {
-  let tLast;
-  let t = 0;
-  for (let n = 0; n < nSegs; ++n) {
-    tLast = t;
-    t = (n+1)/nSegs;
-    present.stroke(lerpColor(c1, c2, (n)/(nSegs-1)));
-    present.line(
-      lerp(x1, x2, tLast), lerp(y1, y2, tLast),
-      lerp(x1, x2, t), lerp(y1, y2, t)
-    );
-  }
+function bicolorLine(x1, y1, c1, x2, y2, c2) {
+  x_mid = lerp(x1, x2, 0.5);
+  y_mid = lerp(y1, y2, 0.5);
+  present.stroke(c1);
+  present.line(x1, y1, x_mid, y_mid);
+  present.stroke(c2);
+  present.line(x_mid, y_mid, x2, y2);
 }
 
 function drawChildren(until) {
@@ -196,7 +189,7 @@ function drawChildren(until) {
       children[next] = empty;
     } else {
       children[next] = varyColor(ancestors[src]);
-      gradLine(
+      bicolorLine(
         hSep*(next + 0.5*shift + 0.5), vSep*1.5, children[next],
         hSep*(src + 0.5*(1-shift) - 0.5), vSep*0.5, ancestors[src]
       );

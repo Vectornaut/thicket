@@ -39,6 +39,16 @@ let empty;
 // container
 let canvasParent;
 
+function decideScrollBorders() {
+  console.log('scroll width ' + canvasParent.scrollWidth.toString() + ', client width ' + canvasParent.clientWidth.toString());
+  if (canvasParent.scrollWidth > canvasParent.clientWidth) {
+    canvasParent.style.borderLeftColor = '#276b40';
+  } else {
+    canvasParent.style.borderLeftColor = 'transparent';
+  }
+  canvasParent.style.borderRightColor = canvasParent.style.borderLeftColor;
+}
+
 function setup() {
   // set row spacing
   vSep = round(hSep * 0.5 * sqrt(3));
@@ -73,7 +83,9 @@ function setup() {
   bg = color(0x7f, 0xb8, 0x8f); // dustier sage
   canvas.parent('thicket');
   canvasParent = canvas.parent();
-  document.getElementById('wrapper').style.maxWidth = canvas.width.toString() + 'px';
+  document.getElementById('wrapper').style.maxWidth = (canvas.width + 2).toString() + 'px';
+  decideScrollBorders();
+  window.addEventListener('resize', decideScrollBorders);
   background(bg);
   frameRate(30);
   

@@ -78,6 +78,7 @@ p {
 
 #wrapper {
   margin-left: 120px;
+  margin-right: 120px;
   margin-bottom: 60px;
 }
 
@@ -92,8 +93,11 @@ p {
 }
 
 #thicket {
-  margin-right: 120px;
-  display: inline-block;
+  /*margin-right: 120px;*/
+  /*display: inline-block;*/
+  overflow-x: auto;
   border-top: 1px solid #276b40;
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
   background-color: inherit;
 }

@@ -1,9 +1,6 @@
 body {
   margin: 0;
-  /*color: #dedede;*/
   color: black;
-  /*background-color: #66baaa;*/
-  /*background-color: #6dbc85;*/
   background-color: #7fb88f;
   font-family: Arial, sans-serif;
 }
@@ -93,8 +90,6 @@ p {
 }
 
 #thicket {
-  /*margin-right: 120px;*/
-  /*display: inline-block;*/
   overflow-x: auto;
   border-top: 1px solid #276b40;
   border-left: 1px solid transparent;

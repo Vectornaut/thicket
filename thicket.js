@@ -40,7 +40,6 @@ let empty;
 let canvasParent;
 
 function decideScrollBorders() {
-  console.log('scroll width ' + canvasParent.scrollWidth.toString() + ', client width ' + canvasParent.clientWidth.toString());
   if (canvasParent.scrollWidth > canvasParent.clientWidth) {
     canvasParent.style.borderLeftColor = '#276b40';
   } else {
@@ -78,12 +77,10 @@ function setup() {
   shuffle(birthOrder, true);
   
   // set up canvas
-  /*bg = color(0x66, 0xba, 0xaa); // turqouise */
-  /*bg = color(0x6d, 0xbc, 0x85); // sage */
   bg = color(0x7f, 0xb8, 0x8f); // dustier sage
   canvas.parent('thicket');
   canvasParent = canvas.parent();
-  document.getElementById('wrapper').style.maxWidth = (canvas.width + 2).toString() + 'px';
+  document.getElementById('wrapper').style.maxWidth = (canvas.width + 2).toString() + 'px'; // add 2px for borders
   decideScrollBorders();
   window.addEventListener('resize', decideScrollBorders);
   background(bg);

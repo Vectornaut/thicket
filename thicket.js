@@ -52,12 +52,12 @@ function setup() {
   present = createGraphics(width, 3*vSep);
   
   // initialize ancestors
-  dark = color(0x24, 0xae, 0xff);
-  light = color(0xde);
-  empty = color(0x0);
+  dark = color(0x0);
+  light = color(0xff);
+  empty = color(0x80);
   ancestors[0] = empty;
   for (let n = 0; n < pop; n++) {
-    ancestors[n+1] = (abs(2*n - (pop-1)) <= 1) ? light : empty;
+    ancestors[n+1] = (abs(2*n - (pop-1)) <= 1) ? dark : empty;
   }
   ancestors[pop+1] = empty;
   
@@ -68,7 +68,9 @@ function setup() {
   shuffle(birthOrder, true);
   
   // set up canvas
-  bg = color(0x12);
+  /*bg = color(0x66, 0xba, 0xaa); // turqouise */
+  /*bg = color(0x6d, 0xbc, 0x85); // sage */
+  bg = color(0x7f, 0xb8, 0x8f); // dustier sage
   canvas.parent('thicket');
   canvasParent = canvas.parent();
   document.getElementById('wrapper').style.maxWidth = canvas.width.toString() + 'px';

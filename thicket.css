@@ -1,15 +1,24 @@
 body {
-  color: #dedede;
-  background-color: #121212;
+  margin: 0;
+  /*color: #dedede;*/
+  color: black;
+  /*background-color: #66baaa;*/
+  /*background-color: #6dbc85;*/
+  background-color: #7fb88f;
   font-family: Arial, sans-serif;
 }
 
 a, a:active, a:visited {
-  color: #999999;
+  color: #276b40;
 }
 
 div {
   margin-top: 60px;
+}
+
+p {
+  margin-top: 15px;
+  margin-bottom: 0;
 }
 
 /* navigation bar */
@@ -18,9 +27,9 @@ div {
   width: 100%;
   display: flex;
   flex-direction: row;
-  margin: 0 0 0 0;
-  padding: 0 0 0 0;
-  background-color: #550044;
+  margin: 0;
+  padding: 0;
+  background-color: #c5ecce;
 }
 
 #navbar ul {
@@ -28,8 +37,8 @@ div {
   flex-direction: row;
   overflow-x: scroll;
   list-style-type: none;
-  margin: 0 0 0 0;
-  padding: 0 0 0 0;
+  margin: 0;
+  padding: 0;
 }
 
 #navbar li {
@@ -42,16 +51,17 @@ div {
   white-space: nowrap;
   padding: 6px 12px 8px 12px;
   text-align: center;
-  color: white;
   text-decoration: none;
+  color: black;
 }
 
 #navbar li a:hover {
-  background-color: #999999;
+  background-color: #91d6a4;
 }
 
 #navbar .here {
-  background-color: #999999;
+  background-color: #276b40;
+  color: white;
 }
 
 #navbar .title {
@@ -71,8 +81,19 @@ div {
   margin-bottom: 60px;
 }
 
+#wrapper > div:not(#thicket) {
+  padding: 15px;
+  border-radius: 15px;
+  background-color: #c5ecce;
+}
+
+#wrapper > div p:first-child {
+  margin-top: 0;
+}
+
 #thicket {
   margin-right: 120px;
   display: inline-block;
-  border-top: 1px solid #aa0088;
+  border-top: 1px solid #276b40;
+  background-color: inherit;
 }

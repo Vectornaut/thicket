@@ -31,9 +31,13 @@ let past = new Array(nGens-2);
 let present;
 
 // colors
+let bg;
 let dark;
+let light;
 let empty;
-let init;
+
+// container
+let canvasParent;
 
 function setup() {
   // set row spacing
@@ -48,11 +52,12 @@ function setup() {
   present = createGraphics(width, 3*vSep);
   
   // initialize ancestors
-  init = color(0x96);
+  dark = color(0x24, 0xae, 0xff);
+  light = color(0xde);
   empty = color(0x0);
   ancestors[0] = empty;
   for (let n = 0; n < pop; n++) {
-    ancestors[n+1] = (abs(2*n - (pop-1)) <= 1) ? init : empty;
+    ancestors[n+1] = (abs(2*n - (pop-1)) <= 1) ? light : empty;
   }
   ancestors[pop+1] = empty;
   
@@ -63,18 +68,19 @@ function setup() {
   shuffle(birthOrder, true);
   
   // set up canvas
-  dark = color(0x12);
+  bg = color(0x12);
   canvas.parent('thicket');
+  canvasParent = canvas.parent();
   document.getElementById('wrapper').style.maxWidth = canvas.width.toString() + 'px';
-  background(dark);
+  background(bg);
   frameRate(30);
   
   // set up buffers
   /*for (let n = 0; n < nGens-1; ++n) {
     past[n].background(150, 255, 0);
   }*/
-  present.background(dark);
-  present.fill(dark);
+  present.background(bg);
+  present.fill(bg);
   present.strokeWeight(0.4*hSep);
 }
 
@@ -134,12 +140,12 @@ function advanceBuffers() {
   present.rect(0, vSep, present.width, vSep);
 }
 
-function varyChannel(u) {
-  return constrain(u - 1 + floor(random(3)), 0, 255);
-}
-
 function varyColor(c) {
-  return color(varyChannel(red(c)), varyChannel(green(c)), varyChannel(blue(c)));
+  if (random(0, 1) < canvasParent.getAttribute('mutation_rate')) {
+    return c == dark ? light : dark;
+  } else {
+    return c;
+  }
 }
 
 const nSegs = 2;
@@ -172,7 +178,6 @@ function drawChildren(until) {
                                             : 1 - (pop-1 - next)/waist;
     if (ancestors[src] == empty && random() > saveDifficulty) {
       src += 2*choice - 1;
-      console.log('Saving throw > ' + str(saveDifficulty));
     }
     
     // pick the child's color. draw it, unless it's empty

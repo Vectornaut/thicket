@@ -11,21 +11,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <link rel="stylesheet" type="text/css" href="thicket.css" />
-  <style>
-    #wrapper {
-      max-width: 972px;
-      margin-right: 120px;
-    }
-  </style>
+  
+  <script type="text/javascript" src="../p5.min.js"></script>
+  <script type="text/javascript" src="thicket.js"></script>
 </head>
 
 <body>
   <div id="navbar">
     <div class="title">Visualizing neutral theory</div>
     <ul>
-      <li><a class="here" href="index.html">Title</a></li>
+      <li><a href="index.html">Title</a></li>
       <li><a href="descent.html">Descent</a></li>
-      <li><a href="mutation.html">Mutation</a></li>
+      <li><a class="here" href="mutation.html">Mutation</a></li>
       <li><a href="lineages.html">Lineages</a></li>
       <li><a href="persistence.html">Persistence</a></li>
       <li><a href="correlation.html">Correlation</a></li>
@@ -40,11 +37,8 @@
     </ul>
   </div>
   <div id="wrapper">
-    <div><b><a href="..">Aaron Fenyes</a></b> (<a href="http://www.ihes.fr">IH&Eacute;S</a>)</div>
-    <div>
-      <p>In this expository talk, I&rsquo;ll use 1d voter models to illustrate basic features of <a href="https://www.quantamagazine.org/how-neutral-theory-altered-ideas-about-biodiversity-20201208/">neutral theory</a>—a vision of how genetic and ecological diversity can emerge even without selective pressure. We&rsquo;ll see how questions about the persistence and spatial organization of lineages can be rephrased, in these models, as questions about random walks.</p>
-      <p>I&rsquo;ll post my slides here so you can follow along at home.</p>
-    </div>
+    <div>LINEAGE TEST</div>
+    <div id="thicket" mutation_rate="1e-3" genealogy></div>
   </div>
 </body>
 </html>

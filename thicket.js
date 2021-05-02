@@ -26,9 +26,18 @@ let scrolling = false;
 let lift;
 let scrolled = 0;
 
-// buffers
+// tree buffers
 let past = new Array(nGens-2);
 let present;
+
+// genealogy
+let pastSources;
+let presentSources = null;
+const waiting = -1;
+
+// lineage buffers
+let pastLineage;
+let presentLineage = null;
 
 // colors
 let bg;
@@ -53,7 +62,7 @@ function setup() {
   vSep = round(hSep * 0.5 * sqrt(3));
   lift = vSep*(nGens-5);
   
-  // create canvas and buffers
+  // create canvas and tree buffers
   let canvas = createCanvas(hSep*(pop + 0.5), vSep*nGens);
   for (let n = 0; n < nGens-2; ++n) {
     past[n] = createGraphics(width, vSep);
@@ -65,8 +74,8 @@ function setup() {
   light = color(0xff);
   empty = color(0x80);
   ancestors[0] = empty;
-  for (let n = 0; n < pop; n++) {
-    ancestors[n+1] = (abs(2*n - (pop-1)) <= 1) ? dark : empty;
+  for (let k = 0; k < pop; k++) {
+    ancestors[k+1] = (abs(2*k - (pop-1)) <= 1) ? dark : empty;
   }
   ancestors[pop+1] = empty;
   
@@ -80,6 +89,7 @@ function setup() {
   bg = color(0x7f, 0xb8, 0x8f); // dustier sage
   canvas.parent('thicket');
   canvasParent = canvas.parent();
+  canvasParent.addEventListener('click', drawLineage)
   document.getElementById('wrapper').style.maxWidth = (canvas.width + 2).toString() + 'px'; // add 2px for borders
   decideScrollBorders();
   window.addEventListener('resize', decideScrollBorders);
@@ -93,6 +103,27 @@ function setup() {
   present.background(bg);
   present.fill(bg);
   present.strokeWeight(0.4*hSep);
+  
+  // create genealogy and lineage buffers
+  if (canvasParent.hasAttribute('genealogy')) {
+    // create genealogy
+    pastSources = new Array(nGens);
+    for (let n = 0; n < nGens; ++n) {
+      pastSources[n] = new Array(pop);
+    }
+    presentSources = new Array(pop);
+    clearPresentSources();
+    
+    // create lineage buffers
+    pastLineage = new Array(nGens);
+    for (let n = 0; n < nGens; ++n) {
+      pastLineage[n] = createGraphics(width, vSep);
+      pastLineage[n].stroke(color(0xff, 0x80, 0x00));
+    }
+    presentLineage = true;
+    /*presentLineage = createGraphics(width, 2*vSep);
+    presentLineage.stroke(color(0xff, 0x0, 0xff));*/
+  }
 }
 
 function draw() {
@@ -103,6 +134,13 @@ function draw() {
   if (scrolled == vSep) {
     // advance buffers
     advanceBuffers();
+    
+    // advance genealogy
+    if (presentSources != null) {
+      pastSources.push(presentSources);
+      presentSources = pastSources.shift();
+      clearPresentSources();
+    }
     
     // yesterday's children are today's ancestors. note that `ancestors` is
     // padded with empty boundary cells at 0 and `pop+1`.
@@ -121,15 +159,29 @@ function draw() {
     scrolled = 0;
   }
   
-  // paint the buffers onto the screen
+  // paint the tree buffers onto the screen
   for (let n = 0; n < nGens-2; ++n) {
     image(past[n], 0, n*vSep - (lift + scrolled));
   }
   image(present, 0, (nGens-2)*vSep - (lift + scrolled));
   
+  // paint the lineage buffers onto the screen
+  if (presentLineage != null) {
+    for (let n = 0; n < nGens; ++n) {
+      image(pastLineage[n], 0, n*vSep - (lift + scrolled));
+    }
+    /*image(presentLineage, 0, (nGens-2)*vSep - (lift + scrolled));*/
+  }
+  
   // move the buffer image
   if (lift > 0) --lift;
   ++scrolled;
+}
+
+function clearPresentSources() {
+  for (let k = 0; k < pop; ++k) {
+    presentSources[k] = waiting;
+  }
 }
 
 function advanceBuffers() {
@@ -149,10 +201,19 @@ function advanceBuffers() {
   );
   present.noStroke();
   present.rect(0, vSep, present.width, vSep);
+  
+  // advance lineage buffers
+  if (presentLineage != null) {
+    /*pastLineage.push(presentLineage);
+    presentLineage = pastLineage.shift();
+    presentLineage.clear();*/
+    pastLineage[0].clear();
+    pastLineage.push(pastLineage.shift());
+  }
 }
 
 function varyColor(c) {
-  if (random(0, 1) < canvasParent.getAttribute('mutation_rate')) {
+  if (random() < canvasParent.getAttribute('mutation_rate')) {
     return c == dark ? light : dark;
   } else {
     return c;
@@ -193,6 +254,33 @@ function drawChildren(until) {
         hSep*(next + 0.5*shift + 0.5), vSep*1.5, children[next],
         hSep*(src + 0.5*(1-shift) - 0.5), vSep*0.5, ancestors[src]
       );
+    }
+    
+    // record source (without index padding)
+    if (presentSources != null) {
+      presentSources[next] = src-1;
+    }
+  }
+}
+
+/*function drawLineage(head) {*/
+function drawLineage() {
+  let head = 60; /*[TEST]*/
+  let src = presentSources[head];
+  if (src != -1) {
+    let hShift = shift;
+    for (let n = nGens-1; n > 0; --n) {
+      pastLineage[n].line(
+        hSep*(head + 0.5*hShift + 0.5), vSep*0.5,
+        hSep*(src + 0.5*(1-hShift) + 0.5), vSep*(-0.5),
+      );
+      pastLineage[n-1].line(
+        hSep*(head + 0.5*hShift + 0.5), vSep*1.5,
+        hSep*(src + 0.5*(1-hShift) + 0.5), vSep*0.5,
+      );
+      head = src;
+      src = pastSources[n][head];
+      hShift = 1-hShift;
     }
   }
 }

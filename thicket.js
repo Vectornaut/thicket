@@ -36,8 +36,7 @@ let presentSources = null;
 const waiting = -1;
 
 // lineage buffers
-let pastLineage;
-let presentLineage = null;
+let lineage;
 
 // colors
 let bg;
@@ -115,14 +114,11 @@ function setup() {
     clearPresentSources();
     
     // create lineage buffers
-    pastLineage = new Array(nGens);
+    lineage = new Array(nGens);
     for (let n = 0; n < nGens; ++n) {
-      pastLineage[n] = createGraphics(width, vSep);
-      pastLineage[n].stroke(color(0xff, 0x80, 0x00));
+      lineage[n] = createGraphics(width, vSep);
+      lineage[n].stroke(color(0xff, 0x80, 0x00));
     }
-    presentLineage = true;
-    /*presentLineage = createGraphics(width, 2*vSep);
-    presentLineage.stroke(color(0xff, 0x0, 0xff));*/
   }
 }
 
@@ -166,11 +162,10 @@ function draw() {
   image(present, 0, (nGens-2)*vSep - (lift + scrolled));
   
   // paint the lineage buffers onto the screen
-  if (presentLineage != null) {
+  if (presentSources != null) {
     for (let n = 0; n < nGens; ++n) {
-      image(pastLineage[n], 0, n*vSep - (lift + scrolled));
+      image(lineage[n], 0, n*vSep - (lift + scrolled));
     }
-    /*image(presentLineage, 0, (nGens-2)*vSep - (lift + scrolled));*/
   }
   
   // move the buffer image
@@ -203,12 +198,9 @@ function advanceBuffers() {
   present.rect(0, vSep, present.width, vSep);
   
   // advance lineage buffers
-  if (presentLineage != null) {
-    /*pastLineage.push(presentLineage);
-    presentLineage = pastLineage.shift();
-    presentLineage.clear();*/
-    pastLineage[0].clear();
-    pastLineage.push(pastLineage.shift());
+  if (presentSources != null) {
+    lineage[0].clear();
+    lineage.push(lineage.shift());
   }
 }
 
@@ -270,14 +262,15 @@ function drawLineage() {
   if (src != -1) {
     let hShift = shift;
     for (let n = nGens-1; n > 0; --n) {
-      pastLineage[n].line(
-        hSep*(head + 0.5*hShift + 0.5), vSep*0.5,
-        hSep*(src + 0.5*(1-hShift) + 0.5), vSep*(-0.5),
-      );
-      pastLineage[n-1].line(
-        hSep*(head + 0.5*hShift + 0.5), vSep*1.5,
-        hSep*(src + 0.5*(1-hShift) + 0.5), vSep*0.5,
-      );
+      // draw line of descent
+      x1 = hSep*(head + 0.5*hShift + 0.5);
+      x2 = hSep*(src + 0.5*(1-hShift) + 0.5);
+      y1 = vSep*0.5;
+      y2 = vSep*(-0.5);
+      lineage[n].line(x1, y1, x2, y2);
+      lineage[n-1].line(x1, y1 + vSep, x2, y2 + vSep);
+      
+      // step to previous generation
       head = src;
       src = pastSources[n][head];
       hShift = 1-hShift;

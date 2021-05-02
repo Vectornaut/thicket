@@ -34,6 +34,7 @@ let present;
 let pastSources;
 let presentSources = null;
 const waiting = -1;
+const requested = -2;
 
 // lineage buffers
 let lineage;
@@ -88,7 +89,6 @@ function setup() {
   bg = color(0x7f, 0xb8, 0x8f); // dustier sage
   canvas.parent('thicket');
   canvasParent = canvas.parent();
-  canvasParent.addEventListener('click', drawLineage)
   document.getElementById('wrapper').style.maxWidth = (canvas.width + 2).toString() + 'px'; // add 2px for borders
   decideScrollBorders();
   window.addEventListener('resize', decideScrollBorders);
@@ -173,6 +173,17 @@ function draw() {
   ++scrolled;
 }
 
+function mouseClicked() {
+  if (presentSources != null) {
+    head = 60;
+    if (presentSources[head] < 0) {
+      presentSources[head] = requested;
+    } else {
+      drawLineage(head);
+    }
+  }
+}
+
 function clearPresentSources() {
   for (let k = 0; k < pop; ++k) {
     presentSources[k] = waiting;
@@ -250,30 +261,28 @@ function drawChildren(until) {
     
     // record source (without index padding)
     if (presentSources != null) {
+      let req = presentSources[next] == requested;
       presentSources[next] = src-1;
+      if (req) drawLineage(next);
     }
   }
 }
 
-/*function drawLineage(head) {*/
-function drawLineage() {
-  let head = 60; /*[TEST]*/
+function drawLineage(head) {
   let src = presentSources[head];
-  if (src != -1) {
-    let hShift = shift;
-    for (let n = nGens-1; n > 0; --n) {
-      // draw line of descent
-      x1 = hSep*(head + 0.5*hShift + 0.5);
-      x2 = hSep*(src + 0.5*(1-hShift) + 0.5);
-      y1 = vSep*0.5;
-      y2 = vSep*(-0.5);
-      lineage[n].line(x1, y1, x2, y2);
-      lineage[n-1].line(x1, y1 + vSep, x2, y2 + vSep);
-      
-      // step to previous generation
-      head = src;
-      src = pastSources[n][head];
-      hShift = 1-hShift;
-    }
+  let hShift = shift;
+  for (let n = nGens-1; n > 0; --n) {
+    // draw line of descent
+    x1 = hSep*(head + 0.5*hShift + 0.5);
+    x2 = hSep*(src + 0.5*(1-hShift) + 0.5);
+    y1 = vSep*0.5;
+    y2 = vSep*(-0.5);
+    lineage[n].line(x1, y1, x2, y2);
+    lineage[n-1].line(x1, y1 + vSep, x2, y2 + vSep);
+    
+    // step to previous generation
+    head = src;
+    src = pastSources[n][head];
+    hShift = 1-hShift;
   }
 }

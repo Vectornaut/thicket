@@ -2,13 +2,16 @@
 p5.disableFriendlyErrors = true;
 
 // layout
-const pop_base = 60;
+/*const pop_base = 60;
 const nGens_base = 50;
-const hSep_base = 16/*32*/;
+const hSep_base = 16;*/
+const pop_base = 120;
+const nGens_base = 100;
+const hSep_base = 8;
 /*const pop = 121;
 const nGens = 100;
 const hSep_base = 8;*/
-let scale = 2;
+let scale = 1;
 let pop = 1 + scale*pop_base;
 let nGens = scale*scale*pop_base;
 let hSep;
@@ -116,7 +119,7 @@ function setup() {
     // create lineage buffers
     lineage = new Array(nGens);
     for (let n = 0; n < nGens; ++n) {
-      lineage[n] = createGraphics(width, vSep);
+      lineage[n] = createGraphics(width, 2*vSep);
       lineage[n].strokeWeight(0.45*hSep);
     }
   }
@@ -141,7 +144,7 @@ function setup() {
   /*for (let n = 0; n < nGens-1; ++n) {
     past[n].background(150, 255, 0);
   }*/
-  /*present.background(bg);*/present.background(0x80);
+  present.background(bg);
   present.fill(bg);
   present.strokeWeight(0.4*hSep);
 }
@@ -192,7 +195,7 @@ function draw() {
   // paint the lineage buffers onto the screen
   if (presentSources != null) {
     for (let n = 0; n < nGens; ++n) {
-      image(lineage[n], 0, n*vSep - (lift + scrolled));
+      image(lineage[n], 0, (n-1)*vSep - (lift + scrolled));
     }
   }
   
@@ -317,6 +320,7 @@ function drawLineage(head, n) {
   let traced;
   let hShift;
   let headColor;
+  let srcColor;
   if (n >= nGens || n === undefined) {
     headColor = presentColors[head];
     src = presentSources[head];
@@ -336,17 +340,20 @@ function drawLineage(head, n) {
     lineage[n].stroke(headColor);
     for (; n > 0 && !traced && src >= 0 && pastColors[n][src]; --n) {
       // get source color
-      lineage[n-1].stroke(pastColors[n][src]);
+      srcColor = pastColors[n][src];
       
       // draw line of descent
       let x1 = hSep*(head + 0.5*hShift + 0.5);
       let x2 = hSep*(src + 0.5*(1-hShift) + 0.5);
       x_mid = lerp(x1, x2, 0.5);
-      lineage[n].line(x1, 0.5*vSep, x_mid, 0);
-      lineage[n-1].line(x_mid, vSep, x2, 0.5*vSep);
+      lineage[n].stroke(headColor);
+      lineage[n].line(x1, 1.5*vSep, x_mid, vSep);
+      lineage[n].stroke(srcColor);
+      lineage[n].line(x_mid, vSep, x2, 0.5*vSep);
       
       // step to previous generation
       head = src;
+      headColor = srcColor;
       src = pastSources[n][head];
       traced = pastTraces[n][head];
       pastTraces[n][head] = true;

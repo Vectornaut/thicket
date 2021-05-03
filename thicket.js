@@ -324,16 +324,14 @@ function drawLineage(head, n) {
     lineage[n].stroke(headColor);
     for (; n > 0 && !traced && src >= 0 && pastColors[n][src]; --n) {
       // get source color
-      /*lineage[n-1].stroke(pastColors[n][src]);*/
-      lineage[n-1].stroke(color(random(255), random(255), random(255)));
+      lineage[n-1].stroke(pastColors[n][src]);
       
       // draw line of descent
-      x1 = hSep*(head + 0.5*hShift + 0.5);
-      x2 = hSep*(src + 0.5*(1-hShift) + 0.5);
-      y1 = vSep*0.5;
-      y2 = vSep*(-0.5);
-      lineage[n].line(x1, y1, x2, y2);
-      lineage[n-1].line(x1, y1 + vSep, x2, y2 + vSep);
+      let x1 = hSep*(head + 0.5*hShift + 0.5);
+      let x2 = hSep*(src + 0.5*(1-hShift) + 0.5);
+      x_mid = lerp(x1, x2, 0.5);
+      lineage[n].line(x1, 0.5*vSep, x_mid, 0);
+      lineage[n-1].line(x_mid, vSep, x2, 0.5*vSep);
       
       // step to previous generation
       head = src;

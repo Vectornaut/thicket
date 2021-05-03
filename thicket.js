@@ -33,6 +33,8 @@ let present;
 // genealogy
 let pastSources;
 let presentSources = null;
+let pastColors;
+let presentColors;
 const waiting = -1;
 const requested = -2;
 
@@ -69,22 +71,6 @@ function setup() {
   }
   present = createGraphics(width, 3*vSep);
   
-  // initialize ancestors
-  dark = color(0x0);
-  light = color(0xff);
-  empty = color(0x80);
-  ancestors[0] = empty;
-  for (let k = 0; k < pop; k++) {
-    ancestors[k+1] = (abs(2*k - (pop-1)) <= 1) ? dark : empty;
-  }
-  ancestors[pop+1] = empty;
-  
-  // initialize birth order
-  for (let n = 0; n < pop; ++n) {
-    birthOrder[n] = n;
-  }
-  shuffle(birthOrder, true);
-  
   // set up canvas
   bg = color(0x7f, 0xb8, 0x8f); // dustier sage
   canvas.parent('thicket');
@@ -95,6 +81,46 @@ function setup() {
   background(bg);
   frameRate(30);
   
+  // create genealogy and lineage buffers
+  if (canvasParent.hasAttribute('genealogy')) {
+    // create genealogy
+    pastSources = new Array(nGens);
+    pastColors = new Array(nGens);
+    for (let n = 0; n < nGens; ++n) {
+      pastSources[n] = new Array(pop);
+      pastColors[n] = new Array(pop);
+    }
+    presentSources = new Array(pop);
+    presentColors = new Array(pop);
+    clearPresent();
+    
+    // create lineage buffers
+    lineage = new Array(nGens);
+    for (let n = 0; n < nGens; ++n) {
+      lineage[n] = createGraphics(width, vSep);
+      lineage[n].strokeWeight(0.45*hSep);
+    }
+  }
+  
+  // initialize ancestors
+  dark = color(0x0);
+  light = color(0xff);
+  empty = color(0x80);
+  ancestors[0] = empty;
+  for (let k = 0; k < pop; k++) {
+    ancestors[k+1] = (abs(2*k - (pop-1)) <= 1) ? dark : empty;
+    if (presentSources != null) {
+      pastColors[nGens-1][k] = ancestors[k+1];
+    }
+  }
+  ancestors[pop+1] = empty;
+  
+  // initialize birth order
+  for (let n = 0; n < pop; ++n) {
+    birthOrder[n] = n;
+  }
+  shuffle(birthOrder, true);
+  
   // set up buffers
   /*for (let n = 0; n < nGens-1; ++n) {
     past[n].background(150, 255, 0);
@@ -102,24 +128,6 @@ function setup() {
   present.background(bg);
   present.fill(bg);
   present.strokeWeight(0.4*hSep);
-  
-  // create genealogy and lineage buffers
-  if (canvasParent.hasAttribute('genealogy')) {
-    // create genealogy
-    pastSources = new Array(nGens);
-    for (let n = 0; n < nGens; ++n) {
-      pastSources[n] = new Array(pop);
-    }
-    presentSources = new Array(pop);
-    clearPresentSources();
-    
-    // create lineage buffers
-    lineage = new Array(nGens);
-    for (let n = 0; n < nGens; ++n) {
-      lineage[n] = createGraphics(width, vSep);
-      lineage[n].stroke(color(0xff, 0x80, 0x00));
-    }
-  }
 }
 
 function draw() {
@@ -135,7 +143,9 @@ function draw() {
     if (presentSources != null) {
       pastSources.push(presentSources);
       presentSources = pastSources.shift();
-      clearPresentSources();
+      pastColors.push(presentColors);
+      presentColors = pastColors.shift();
+      clearPresent();
     }
     
     // yesterday's children are today's ancestors. note that `ancestors` is
@@ -184,7 +194,7 @@ function mouseClicked() {
   }
 }
 
-function clearPresentSources() {
+function clearPresent() {
   for (let k = 0; k < pop; ++k) {
     presentSources[k] = waiting;
   }
@@ -254,15 +264,16 @@ function drawChildren(until) {
     } else {
       children[next] = varyColor(ancestors[src]);
       bicolorLine(
-        hSep*(next + 0.5*shift + 0.5), vSep*1.5, children[next],
-        hSep*(src + 0.5*(1-shift) - 0.5), vSep*0.5, ancestors[src]
+        hSep*(next + 0.5*shift + 0.5), vSep*1.5, lerpColor(children[next], bg, 0.65*(presentSources != null)),
+        hSep*(src + 0.5*(1-shift) - 0.5), vSep*0.5, lerpColor(ancestors[src], bg, 0.65*(presentSources != null))
       );
     }
     
-    // record source (without index padding)
+    // record source (without index padding) and color
     if (presentSources != null) {
       let req = presentSources[next] == requested;
       presentSources[next] = src-1;
+      presentColors[next] = children[next];
       if (req) drawLineage(next);
     }
   }
@@ -270,8 +281,13 @@ function drawChildren(until) {
 
 function drawLineage(head) {
   let src = presentSources[head];
+  lineage[nGens-1].stroke(presentColors[head]);
   let hShift = shift;
-  for (let n = nGens-1; n > 0; --n) {
+  for (let n = nGens-1; n > 0 && pastColors[n][src]; --n) {
+    // get source color
+    console.log(n, pastColors[n][src]);
+    lineage[n-1].stroke(pastColors[n][src]);
+    
     // draw line of descent
     x1 = hSep*(head + 0.5*hShift + 0.5);
     x2 = hSep*(src + 0.5*(1-hShift) + 0.5);

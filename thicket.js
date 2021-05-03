@@ -37,6 +37,7 @@ let pastColors;
 let presentColors;
 const waiting = -1;
 const requested = -2;
+const traced = -3;
 
 // lineage buffers
 let lineage;
@@ -298,20 +299,23 @@ function drawLineage(head, n) {
   if (n >= nGens || n === undefined) {
     headColor = presentColors[head];
     src = presentSources[head];
+    presentSources[head] = traced; // avoid overdrawing lineages
     hShift = shift;
     n = nGens-1;
   } else {
     headColor = pastColors[n][head];
     console.log(n, headColor);
     src = pastSources[n][head];
+    pastSources[n][head] = traced; // avoid overdrawing lineages
     hShift = (n - nGens) % 2 ? 1-shift : shift;
     --n;
   }
   if (headColor != empty) {
     lineage[n].stroke(headColor);
-    for (; n > 0 && pastColors[n][src]; --n) {
+    for (; n > 0 && src >= 0 && pastColors[n][src]; --n) {
       // get source color
-      lineage[n-1].stroke(pastColors[n][src]);
+      /*lineage[n-1].stroke(pastColors[n][src]);*/
+      lineage[n-1].stroke(color(random(255), random(255), random(255)));
       
       // draw line of descent
       x1 = hSep*(head + 0.5*hShift + 0.5);
@@ -324,6 +328,7 @@ function drawLineage(head, n) {
       // step to previous generation
       head = src;
       src = pastSources[n][head];
+      pastSources[n][head] = traced; // avoid overdrawing lineages
       hShift = 1-hShift;
     }
   }

@@ -2,19 +2,24 @@
 p5.disableFriendlyErrors = true;
 
 // layout
-/*const pop = 61;
-const nGens = 50;
-const hSep = 16;*/
-const pop = 121;
+const pop_base = 60;
+const nGens_base = 50;
+const hSep_base = 16/*32*/;
+/*const pop = 121;
 const nGens = 100;
-const hSep = 8;
+const hSep_base = 8;*/
+let scale = 2;
+let pop = 1 + scale*pop_base;
+let nGens = scale*scale*pop_base;
+let hSep;
 let vSep;
 /*final int scrollStep = 1;*/
 
 // under the saving throw mechanism, only the first `waist` cells from either
 // edge are allowed to become empty
-/*const waist = 25;*/
-const waist = 50;
+const waist_base = 25;
+let waist = scale*waist_base;
+/*const waist = 50;*/
 
 // generations
 let shift = 1;
@@ -62,8 +67,11 @@ function decideScrollBorders() {
 }
 
 function setup() {
+  // set column spacing
+  hSep = round(hSep_base/scale);
+  
   // set row spacing
-  vSep = round(hSep * 0.5 * sqrt(3));
+  vSep = round(hSep_base/scale/scale * 0.5 * sqrt(3));
   lift = vSep*(nGens-5);
   
   // create canvas and tree buffers
@@ -82,6 +90,11 @@ function setup() {
   window.addEventListener('resize', decideScrollBorders);
   background(bg);
   frameRate(30);
+  
+  // set colors
+  dark = color(0x0);
+  light = color(0xff);
+  empty = color(0x80);
   
   // create genealogy and lineage buffers
   if (canvasParent.hasAttribute('genealogy')) {
@@ -109,9 +122,6 @@ function setup() {
   }
   
   // initialize ancestors
-  dark = color(0x0);
-  light = color(0xff);
-  empty = color(0x80);
   ancestors[0] = empty;
   for (let k = 0; k < pop; k++) {
     ancestors[k+1] = (abs(2*k - (pop-1)) <= 1) ? dark : empty;
@@ -131,7 +141,7 @@ function setup() {
   /*for (let n = 0; n < nGens-1; ++n) {
     past[n].background(150, 255, 0);
   }*/
-  present.background(bg);
+  /*present.background(bg);*/present.background(0x80);
   present.fill(bg);
   present.strokeWeight(0.4*hSep);
 }
@@ -192,7 +202,7 @@ function draw() {
 }
 
 function mouseClicked() {
-  if (presentSources != null && mouseY >= 0) {
+  if (presentSources != null && 0 <= mouseY && 0 <= mouseX && mouseX < width) {
     if (keyIsDown(SHIFT)) {
       // clear lineages and traces
       for (let n = 0; n < nGens; ++n) {
@@ -204,11 +214,13 @@ function mouseClicked() {
       // draw lineage
       let n = min(nGens, round((mouseY + lift + scrolled)/vSep + 0.5));
       let hShift = (n - nGens) % 2 ? 1-shift : shift;
-      head = round(mouseX/hSep - 0.5*hShift - 0.5);
-      if (n >= nGens && presentSources[head] < 0) {
-        presentSources[head] = requested;
-      } else if (presentColors[head] != empty) {
-        drawLineage(head, n);
+      let head = round(mouseX/hSep - 0.5*hShift - 0.5);
+      if (0 <= head && head < pop) {
+        if (n >= nGens && presentSources[head] < 0) {
+          presentSources[head] = requested;
+        } else {
+          drawLineage(head, n);
+        }
       }
     }
   }
@@ -237,7 +249,7 @@ function advanceBuffers() {
     0, 0, present.width, vSep
   );
   present.noStroke();
-  present.rect(0, vSep, present.width, vSep);
+  present.rect(0, vSep, present.width, 2*vSep);
   
   // advance lineage buffers
   if (presentSources != null) {

@@ -89,6 +89,7 @@ function setup() {
     for (let n = 0; n < nGens; ++n) {
       pastSources[n] = new Array(pop);
       pastColors[n] = new Array(pop);
+      for (let k = 0; k < pop; ++k) pastColors[n][k] = empty;
     }
     presentSources = new Array(pop);
     presentColors = new Array(pop);
@@ -180,7 +181,8 @@ function draw() {
   
   // move the buffer image
   if (lift > 0) --lift;
-  ++scrolled;
+  /*++scrolled;*/
+  if (lift > 0) ++scrolled;
 }
 
 function mouseClicked() {
@@ -192,11 +194,13 @@ function mouseClicked() {
       }
     } else {
       // draw lineage
-      head = round(mouseX/hSep - 0.5*shift - 0.5);
-      if (presentSources[head] < 0) {
+      let n = min(nGens, round((mouseY + lift + scrolled)/vSep + 0.5));
+      let hShift = (n - nGens) % 2 ? 1-shift : shift;
+      head = round(mouseX/hSep - 0.5*hShift - 0.5);
+      if (n >= nGens && presentSources[head] < 0) {
         presentSources[head] = requested;
       } else if (presentColors[head] != empty) {
-        drawLineage(head);
+        drawLineage(head, n);
       }
     }
   }
@@ -287,25 +291,40 @@ function drawChildren(until) {
   }
 }
 
-function drawLineage(head) {
-  let src = presentSources[head];
-  lineage[nGens-1].stroke(presentColors[head]);
-  let hShift = shift;
-  for (let n = nGens-1; n > 0 && pastColors[n][src]; --n) {
-    // get source color
-    lineage[n-1].stroke(pastColors[n][src]);
-    
-    // draw line of descent
-    x1 = hSep*(head + 0.5*hShift + 0.5);
-    x2 = hSep*(src + 0.5*(1-hShift) + 0.5);
-    y1 = vSep*0.5;
-    y2 = vSep*(-0.5);
-    lineage[n].line(x1, y1, x2, y2);
-    lineage[n-1].line(x1, y1 + vSep, x2, y2 + vSep);
-    
-    // step to previous generation
-    head = src;
+function drawLineage(head, n) {
+  let src;
+  let hShift;
+  let headColor;
+  if (n >= nGens || n === undefined) {
+    headColor = presentColors[head];
+    src = presentSources[head];
+    hShift = shift;
+    n = nGens-1;
+  } else {
+    headColor = pastColors[n][head];
+    console.log(n, headColor);
     src = pastSources[n][head];
-    hShift = 1-hShift;
+    hShift = (n - nGens) % 2 ? 1-shift : shift;
+    --n;
+  }
+  if (headColor != empty) {
+    lineage[n].stroke(headColor);
+    for (; n > 0 && pastColors[n][src]; --n) {
+      // get source color
+      lineage[n-1].stroke(pastColors[n][src]);
+      
+      // draw line of descent
+      x1 = hSep*(head + 0.5*hShift + 0.5);
+      x2 = hSep*(src + 0.5*(1-hShift) + 0.5);
+      y1 = vSep*0.5;
+      y2 = vSep*(-0.5);
+      lineage[n].line(x1, y1, x2, y2);
+      lineage[n-1].line(x1, y1 + vSep, x2, y2 + vSep);
+      
+      // step to previous generation
+      head = src;
+      src = pastSources[n][head];
+      hShift = 1-hShift;
+    }
   }
 }

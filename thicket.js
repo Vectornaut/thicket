@@ -33,11 +33,12 @@ let present;
 // genealogy
 let pastSources;
 let presentSources = null;
+let pastTraces;
+let presentTraces;
 let pastColors;
 let presentColors;
 const waiting = -1;
 const requested = -2;
-const traced = -3;
 
 // lineage buffers
 let lineage;
@@ -86,13 +87,16 @@ function setup() {
   if (canvasParent.hasAttribute('genealogy')) {
     // create genealogy
     pastSources = new Array(nGens);
+    pastTraces = new Array(nGens);
     pastColors = new Array(nGens);
     for (let n = 0; n < nGens; ++n) {
       pastSources[n] = new Array(pop);
+      pastTraces[n] = new Array(pop);
       pastColors[n] = new Array(pop);
       for (let k = 0; k < pop; ++k) pastColors[n][k] = empty;
     }
     presentSources = new Array(pop);
+    presentTraces = new Array(pop);
     presentColors = new Array(pop);
     clearPresent();
     
@@ -145,6 +149,8 @@ function draw() {
     if (presentSources != null) {
       pastSources.push(presentSources);
       presentSources = pastSources.shift();
+      pastTraces.push(presentTraces);
+      presentTraces = pastTraces.shift();
       pastColors.push(presentColors);
       presentColors = pastColors.shift();
       clearPresent();
@@ -182,17 +188,18 @@ function draw() {
   
   // move the buffer image
   if (lift > 0) --lift;
-  /*++scrolled;*/
-  if (lift > 0) ++scrolled;
+  ++scrolled;
 }
 
 function mouseClicked() {
   if (presentSources != null && mouseY >= 0) {
     if (keyIsDown(SHIFT)) {
-      // clear lineages
+      // clear lineages and traces
       for (let n = 0; n < nGens; ++n) {
         lineage[n].clear();
+        for (let k = 0; k < pop; ++k) pastTraces[n][k] = false;
       }
+      for (let k = 0; k < pop; ++k) presentTraces[k] = false;
     } else {
       // draw lineage
       let n = min(nGens, round((mouseY + lift + scrolled)/vSep + 0.5));
@@ -210,6 +217,7 @@ function mouseClicked() {
 function clearPresent() {
   for (let k = 0; k < pop; ++k) {
     presentSources[k] = waiting;
+    presentTraces[k] = false;
   }
 }
 
@@ -294,25 +302,27 @@ function drawChildren(until) {
 
 function drawLineage(head, n) {
   let src;
+  let traced;
   let hShift;
   let headColor;
   if (n >= nGens || n === undefined) {
     headColor = presentColors[head];
     src = presentSources[head];
-    presentSources[head] = traced; // avoid overdrawing lineages
+    traced = presentTraces[head];
+    presentTraces[head] = true;
     hShift = shift;
     n = nGens-1;
   } else {
     headColor = pastColors[n][head];
-    console.log(n, headColor);
     src = pastSources[n][head];
-    pastSources[n][head] = traced; // avoid overdrawing lineages
+    traced = pastTraces[n][head];
+    pastTraces[n][head] = true;
     hShift = (n - nGens) % 2 ? 1-shift : shift;
     --n;
   }
   if (headColor != empty) {
     lineage[n].stroke(headColor);
-    for (; n > 0 && src >= 0 && pastColors[n][src]; --n) {
+    for (; n > 0 && !traced && src >= 0 && pastColors[n][src]; --n) {
       // get source color
       /*lineage[n-1].stroke(pastColors[n][src]);*/
       lineage[n-1].stroke(color(random(255), random(255), random(255)));
@@ -328,7 +338,8 @@ function drawLineage(head, n) {
       // step to previous generation
       head = src;
       src = pastSources[n][head];
-      pastSources[n][head] = traced; // avoid overdrawing lineages
+      traced = pastTraces[n][head];
+      pastTraces[n][head] = true;
       hShift = 1-hShift;
     }
   }

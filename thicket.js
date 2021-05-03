@@ -184,12 +184,20 @@ function draw() {
 }
 
 function mouseClicked() {
-  if (presentSources != null) {
-    head = 60;
-    if (presentSources[head] < 0) {
-      presentSources[head] = requested;
+  if (presentSources != null && mouseY >= 0) {
+    if (keyIsDown(SHIFT)) {
+      // clear lineages
+      for (let n = 0; n < nGens; ++n) {
+        lineage[n].clear();
+      }
     } else {
-      drawLineage(head);
+      // draw lineage
+      head = round(mouseX/hSep - 0.5*shift - 0.5);
+      if (presentSources[head] < 0) {
+        presentSources[head] = requested;
+      } else if (presentColors[head] != empty) {
+        drawLineage(head);
+      }
     }
   }
 }
@@ -271,10 +279,10 @@ function drawChildren(until) {
     
     // record source (without index padding) and color
     if (presentSources != null) {
-      let req = presentSources[next] == requested;
+      let takeRequest = presentSources[next] == requested && children[next] != empty;
       presentSources[next] = src-1;
       presentColors[next] = children[next];
-      if (req) drawLineage(next);
+      if (takeRequest) drawLineage(next);
     }
   }
 }
@@ -285,7 +293,6 @@ function drawLineage(head) {
   let hShift = shift;
   for (let n = nGens-1; n > 0 && pastColors[n][src]; --n) {
     // get source color
-    console.log(n, pastColors[n][src]);
     lineage[n-1].stroke(pastColors[n][src]);
     
     // draw line of descent

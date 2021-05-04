@@ -88,7 +88,7 @@ function setMutationRate(mutationRate_base) {
 function setParams() {
   // set layout
   pop = 1 + scale*pop_base;
-  nGens = scale*scale*pop_base;
+  nGens = scale*scale*nGens_base;
   waist = scale*waist_base;
   console.log('waist: ', waist);
   
@@ -192,6 +192,7 @@ function setup() {
   hSep_base = readParam('hsep', 8);
   waist_base = readParam('waist', 50);
   scale = readParam('scale', 1);
+  console.log('nGens_base: ', nGens_base);
   
   // set parameters
   setParams();

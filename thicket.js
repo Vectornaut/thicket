@@ -1,5 +1,5 @@
 // disable friendly error system to speed up execution
-/*p5.disableFriendlyErrors = true;*/
+p5.disableFriendlyErrors = true;
 
 // layout
 /*const pop_base = 60;
@@ -82,7 +82,6 @@ function readParam(name, defaultValue) {
 
 function setMutationRate(mutationRate_base) {
   mutationRate = 1 - pow(1 - mutationRate_base, 1/(scale*scale));
-  console.log('mutation rate: ', mutationRate);
 }
 
 function setParams() {
@@ -90,7 +89,6 @@ function setParams() {
   pop = 1 + scale*pop_base;
   nGens = scale*scale*nGens_base;
   waist = scale*waist_base;
-  console.log('waist: ', waist);
   
   // set mutation rate
   setMutationRate(readParam('mutation_rate', 1e-3));
@@ -101,9 +99,7 @@ function setParams() {
   lift = vSep*(nGens-5);
 }
 
-function createBuffers(debug) {
-  console.log('width: ', width);
-  
+function createBuffers() {
   // create tree buffers
   past = new Array(nGens-2);
   for (let n = 0; n < nGens-2; ++n) {
@@ -112,13 +108,11 @@ function createBuffers(debug) {
   present = createGraphics(width, 3*vSep);
   
   // adjust wrapper size
-  console.log('resizing wrapper');
   document.getElementById('wrapper').style.maxWidth = (width + 2).toString() + 'px'; // add 2px for borders
   decideScrollBorders();
   background(bg);
   
   // create genealogy and lineage buffers
-  console.log('genealogy and lineage buffers');
   if (canvasParent.hasAttribute('genealogy')) {
     // create genealogy
     pastSources = new Array(nGens);
@@ -146,10 +140,7 @@ function createBuffers(debug) {
   }
   
   // make space for children
-  /*console.log('children');*/
   children = new Array(pop);
-  
-  if (!debug) {
   
   // initialize ancestors
   ancestors = new Array(pop+2);
@@ -176,10 +167,6 @@ function createBuffers(debug) {
   present.background(bg);
   present.fill(bg);
   present.strokeWeight(0.4*hSep);
-  
-  } /*[DEBUG]*/
-  
-  console.log('done with buffers');
 }
 
 function setup() {
@@ -192,7 +179,6 @@ function setup() {
   hSep_base = readParam('hsep', 8);
   waist_base = readParam('waist', 50);
   scale = readParam('scale', 1);
-  console.log('nGens_base: ', nGens_base);
   
   // set parameters
   setParams();
@@ -214,12 +200,8 @@ function setup() {
 }
 
 function reset() {
-  console.log('resetting...');
   setParams();
-  console.log('params set');
-  console.log('hSep: ', hSep, ' pop: ', pop, ' vSep: ', vSep, ' nGens: ', nGens);
   resizeCanvas(hSep*(pop + 0.5), vSep*nGens, true);
-  console.log('resized canvas');
   createBuffers();
   
   // reset animation
@@ -235,15 +217,11 @@ function rescale(newScale) {
 }
 
 function draw() {
-  /*console.log('drawing...');*/
-  
   // draw new children
   drawChildren(ceil((scrolled/vSep)*pop));
   
   // if a generation has passed, roll over to the next one
   if (scrolled == vSep) {
-    /*console.log('advance');*/
-    
     // advance buffers
     advanceBuffers();
     

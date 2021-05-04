@@ -38,7 +38,10 @@
     </ul>
   </div>
   <div id="wrapper">
-    <div>Scaling space and time by <i>&alpha;</i> and <i>&alpha;</i><sup>2</sup> carries a random walk toward its continuum limit, a <i>Brownian motion</i>. Our voter model, from the backward perspective, is a system of interacting random walks, so it should approach a continuum limit along the same scaling. Its limit, constructed by Richard Arratia in the late 1970s, is called a <i><a href="https://doi.org/10.1073/pnas.252619099">Brownian web</a></i>.</div>
+    <div>
+      <p>Scaling space and time by <i>&alpha;</i> and <i>&alpha;</i><sup>2</sup> carries a random walk toward its continuum limit, a <i>Brownian motion</i>. Our voter model, from the backward perspective, is a system of interacting random walks, so it should approach a continuum limit along the same scaling. Its limit, constructed by Richard Arratia in the late 1970s, is called a <i><a href="https://doi.org/10.1073/pnas.252619099">Brownian web</a></i>.</p>
+      <p>To include mutation in our continuum limit, we need to reduce the mutation rate per generation as we get more generations per unit time. Scaling the mutation rate by <i>&alpha;</i><sup>2</sup> carries the mutation process on each lineage toward a Poisson process.</p>
+    </div>
     <div><a onclick="rescale(1)">Scale 1</a> | <a onclick="rescale(2)">Scale 2</a> | <a onclick="rescale(3)">Scale 3</a></div>
     <div id="thicket" mutation_rate="1e-2" pop="50" ngens="40" hsep="18" waist="20"></div>
   </div>

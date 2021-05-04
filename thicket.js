@@ -2,30 +2,22 @@
 p5.disableFriendlyErrors = true;
 
 // layout
-/*const pop_base = 60;
-const nGens_base = 50;
-const hSep_base = 16;*/
-let pop_base/* = 120*/;
-let nGens_base/* = 100*/;
-let hSep_base/* = 8*/;
-/*const pop = 121;
-const nGens = 100;
-const hSep_base = 8;*/
+let pop_base;
+let nGens_base;
+let hSep_base;
 let scale;
-let pop/* = 1 + scale*pop_base*/;
-let nGens/* = scale*scale*pop_base*/;
+let pop;
+let nGens;
 let hSep;
 let vSep;
-/*final int scrollStep = 1;*/
 
 // mutation rate
 let mutationRate;
 
 // under the saving throw mechanism, only the first `waist` cells from either
 // edge are allowed to become empty
-let waist_base/* = 25*/;
-let waist/* = scale*waist_base*/;
-/*const waist = 50;*/
+let waist_base;
+let waist;
 
 // generations
 let shift = 1;
@@ -81,7 +73,7 @@ function readParam(name, defaultValue) {
 }
 
 function setMutationRate(mutationRate_base) {
-  mutationRate = 1 - pow(1 - mutationRate_base, 1/(scale*scale));
+  mutationRate = mutationRate_base/(scale*scale);
 }
 
 function setParams() {

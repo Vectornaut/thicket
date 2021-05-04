@@ -1,46 +1,49 @@
 // disable friendly error system to speed up execution
-p5.disableFriendlyErrors = true;
+/*p5.disableFriendlyErrors = true;*/
 
 // layout
 /*const pop_base = 60;
 const nGens_base = 50;
 const hSep_base = 16;*/
-const pop_base = 120;
-const nGens_base = 100;
-const hSep_base = 8;
+let pop_base/* = 120*/;
+let nGens_base/* = 100*/;
+let hSep_base/* = 8*/;
 /*const pop = 121;
 const nGens = 100;
 const hSep_base = 8;*/
-let scale = 1;
-let pop = 1 + scale*pop_base;
-let nGens = scale*scale*pop_base;
+let scale;
+let pop/* = 1 + scale*pop_base*/;
+let nGens/* = scale*scale*pop_base*/;
 let hSep;
 let vSep;
 /*final int scrollStep = 1;*/
 
+// mutation rate
+let mutationRate;
+
 // under the saving throw mechanism, only the first `waist` cells from either
 // edge are allowed to become empty
-const waist_base = 25;
-let waist = scale*waist_base;
+let waist_base/* = 25*/;
+let waist/* = scale*waist_base*/;
 /*const waist = 50;*/
 
 // generations
 let shift = 1;
 let birthCnt = 0;
-let birthOrder = new Array(pop);
-let children = new Array(pop);
-let ancestors = new Array(pop+2);
+let birthOrder;
+let children;
+let ancestors;
 let scrolling = false;
 let lift;
 let scrolled = 0;
 
 // tree buffers
-let past = new Array(nGens-2);
+let past;
 let present;
 
 // genealogy
 let pastSources;
-let presentSources = null;
+let presentSources;
 let pastTraces;
 let presentTraces;
 let pastColors;
@@ -69,37 +72,53 @@ function decideScrollBorders() {
   canvasParent.style.borderRightColor = canvasParent.style.borderLeftColor;
 }
 
-function setup() {
-  // set column spacing
+function readParam(name, defaultValue) {
+  if (canvasParent.hasAttribute(name)) {
+    return Number(canvasParent.getAttribute(name));
+  } else {
+    return defaultValue;
+  }
+}
+
+function setMutationRate(mutationRate_base) {
+  mutationRate = 1 - pow(1 - mutationRate_base, 1/(scale*scale));
+  console.log('mutation rate: ', mutationRate);
+}
+
+function setParams() {
+  // set layout
+  pop = 1 + scale*pop_base;
+  nGens = scale*scale*pop_base;
+  waist = scale*waist_base;
+  console.log('waist: ', waist);
+  
+  // set mutation rate
+  setMutationRate(readParam('mutation_rate', 1e-3));
+  
+  // set spacing
   hSep = round(hSep_base/scale);
-  
-  // set row spacing
-  vSep = round(hSep_base/scale/scale * 0.5 * sqrt(3));
+  vSep = round(hSep_base/(scale*scale) * 0.5 * sqrt(3));
   lift = vSep*(nGens-5);
+}
+
+function createBuffers(debug) {
+  console.log('width: ', width);
   
-  // create canvas and tree buffers
-  let canvas = createCanvas(hSep*(pop + 0.5), vSep*nGens);
+  // create tree buffers
+  past = new Array(nGens-2);
   for (let n = 0; n < nGens-2; ++n) {
     past[n] = createGraphics(width, vSep);
   }
   present = createGraphics(width, 3*vSep);
   
-  // set up canvas
-  bg = color(0x7f, 0xb8, 0x8f); // dustier sage
-  canvas.parent('thicket');
-  canvasParent = canvas.parent();
-  document.getElementById('wrapper').style.maxWidth = (canvas.width + 2).toString() + 'px'; // add 2px for borders
+  // adjust wrapper size
+  console.log('resizing wrapper');
+  document.getElementById('wrapper').style.maxWidth = (width + 2).toString() + 'px'; // add 2px for borders
   decideScrollBorders();
-  window.addEventListener('resize', decideScrollBorders);
   background(bg);
-  frameRate(30);
-  
-  // set colors
-  dark = color(0x0);
-  light = color(0xff);
-  empty = color(0x80);
   
   // create genealogy and lineage buffers
+  console.log('genealogy and lineage buffers');
   if (canvasParent.hasAttribute('genealogy')) {
     // create genealogy
     pastSources = new Array(nGens);
@@ -122,9 +141,18 @@ function setup() {
       lineage[n] = createGraphics(width, 2*vSep);
       lineage[n].strokeWeight(0.45*hSep);
     }
+  } else {
+    presentSources = null; // this signals that we're not recording genealogy
   }
   
+  // make space for children
+  /*console.log('children');*/
+  children = new Array(pop);
+  
+  if (!debug) {
+  
   // initialize ancestors
+  ancestors = new Array(pop+2);
   ancestors[0] = empty;
   for (let k = 0; k < pop; k++) {
     ancestors[k+1] = (abs(2*k - (pop-1)) <= 1) ? dark : empty;
@@ -135,6 +163,7 @@ function setup() {
   ancestors[pop+1] = empty;
   
   // initialize birth order
+  birthOrder = new Array(pop);
   for (let n = 0; n < pop; ++n) {
     birthOrder[n] = n;
   }
@@ -147,14 +176,73 @@ function setup() {
   present.background(bg);
   present.fill(bg);
   present.strokeWeight(0.4*hSep);
+  
+  } /*[DEBUG]*/
+  
+  console.log('done with buffers');
+}
+
+function setup() {
+  // get parent
+  canvasParent = document.getElementById('thicket');
+  
+  // read parameters
+  pop_base = readParam('pop', 120);
+  nGens_base = readParam('ngens', 100);
+  hSep_base = readParam('hsep', 8);
+  waist_base = readParam('waist', 50);
+  scale = readParam('scale', 1);
+  
+  // set parameters
+  setParams();
+  
+  // set colors
+  bg = color(0x7f, 0xb8, 0x8f);
+  dark = color(0x0);
+  light = color(0xff);
+  empty = color(0x80);
+  
+  // set up canvas
+  let canvas = createCanvas(hSep*(pop + 0.5), vSep*nGens);
+  canvas.parent('thicket');
+  window.addEventListener('resize', decideScrollBorders);
+  frameRate(30);
+  
+  // create buffers
+  createBuffers();
+}
+
+function reset() {
+  console.log('resetting...');
+  setParams();
+  console.log('params set');
+  console.log('hSep: ', hSep, ' pop: ', pop, ' vSep: ', vSep, ' nGens: ', nGens);
+  resizeCanvas(hSep*(pop + 0.5), vSep*nGens, true);
+  console.log('resized canvas');
+  createBuffers();
+  
+  // reset animation
+  shift = 1;
+  birthCnt = 0;
+  scrolling = false;
+  scrolled = 0;
+}
+
+function rescale(newScale) {
+  scale = newScale;
+  reset();
 }
 
 function draw() {
+  /*console.log('drawing...');*/
+  
   // draw new children
   drawChildren(ceil((scrolled/vSep)*pop));
   
   // if a generation has passed, roll over to the next one
   if (scrolled == vSep) {
+    /*console.log('advance');*/
+    
     // advance buffers
     advanceBuffers();
     
@@ -187,12 +275,14 @@ function draw() {
   }
   
   // paint the tree buffers onto the screen
+  log('paint tree buffers');
   for (let n = 0; n < nGens-2; ++n) {
     image(past[n], 0, n*vSep - (lift + scrolled));
   }
   image(present, 0, (nGens-2)*vSep - (lift + scrolled));
   
   // paint the lineage buffers onto the screen
+  log('paint lineages');
   if (presentSources != null) {
     for (let n = 0; n < nGens; ++n) {
       image(lineage[n], 0, (n-1)*vSep - (lift + scrolled));
@@ -262,7 +352,7 @@ function advanceBuffers() {
 }
 
 function varyColor(c) {
-  if (random() < canvasParent.getAttribute('mutation_rate')) {
+  if (random() < mutationRate) {
     return c == dark ? light : dark;
   } else {
     return c;

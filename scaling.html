@@ -21,10 +21,10 @@
     <div class="title">Visualizing neutral theory</div>
     <ul>
       <li><a href="index.html">Title</a></li>
-      <li><a class="here" href="descent.html">Descent</a></li>
+      <li><a href="descent.html">Descent</a></li>
       <li><a href="mutation.html">Mutation</a></li>
       <li><a href="lineages.html">Lineages</a></li>
-      <li><a href="scaling.html">Scaling</a></li>
+      <li><a class="here" href="scaling.html">Scaling</a></li>
       <li><a href="persistence.html">Persistence</a></li>
       <li><a href="correlation.html">Correlation</a></li>
       <li><a>Placeholder</a></li>
@@ -38,8 +38,8 @@
     </ul>
   </div>
   <div id="wrapper">
-    <div>This is the family tree of a single cell, branching downward through the generations. Each new cell descends from one of its neighbors in the last generation. A coin flip decides whether it descends from the left or from the right.</div>
-    <div id="thicket" mutation_rate="0"></div>
+    <div><a onclick="rescale(1)">Scale 1</a> | <a onclick="rescale(2)">Scale 2</a> | <a onclick="rescale(4)">Scale 4</a></div>
+    <div id="thicket" mutation_rate="1e-2" pop="60" ngens="50" hsep="16" waist="25" scale="2"></div>
   </div>
 </body>
 </html>

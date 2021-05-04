@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+
+<!--
+  using Material dark theme palette recommendations
+  https://www.material.io/design/color/dark-theme.html
+-->
+
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <link rel="stylesheet" type="text/css" href="thicket.css" />
+  <style>
+    #wrapper {
+      max-width: 972px;
+      margin-right: 120px;
+    }
+  </style>
+  
+  <!-- MathJax -->
+  <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  
+  <!-- Charts.js -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js@3.2.1/dist/chart.min.js"></script>
+</head>
+
+<body>
+  <div id="navbar">
+    <div class="title">Visualizing neutral theory</div>
+    <ul>
+      <li><a href="index.html">Title</a></li>
+      <li><a href="descent.html">Descent</a></li>
+      <li><a href="mutation.html">Mutation</a></li>
+      <li><a href="lineages.html">Lineages</a></li>
+      <li><a href="scaling.html">Scaling</a></li>
+      <li><a class="here" href="coalescence.html">Coalescence</a></li>
+      <li><a href="persistence.html">Persistence</a></li>
+      <li><a href="correlation.html">Correlation</a></li>
+      <li><a>...</a></li>
+    </ul>
+  </div>
+  <div id="wrapper">
+    <div>
+      <p>Take two cells in the present and follow their lineages back through time. There's a 100% chance that the lineages eventually meet at a common ancestor. How long ago does that happen?</p>
+      <p>In the continuum limit, each lineage is a Brownian motion with variance 1/4 per unit time. The lineages stay independent until they meet, so their difference is a Brownian motion with variance 1/2 per unit time. We&rsquo;ve turned our question about common ancestors into a question about random walks: if a Brownian motion with variance 1/2 per unit time starts a distance \(r\) from zero, how long does it take to hit zero? The probability density of hitting zero at time \(t\) turns out to be
+      \[ \rho_\text{coalesce}(t) = \frac{r}{\sqrt{\pi}}\,t^{-3/2}\,e^{-r^2/t}. \]</p>
+    </div>
+    <div><canvas id="plotCanvas"></canvas></div>
+  </div>
+  <script>
+    // hat tip StackOverflow user tektiv
+    // https://stackoverflow.com/a/40128171/1644283
+    let plotter = {
+      beforeInit: function(chart) {
+        // fetch chart data and options
+        let data = chart.config.data;
+        let options = chart.config.options;
+        
+        // create labels
+        let xmin = chart.options.scales.x.min;
+        let xmax = chart.options.scales.x.max;
+        let pts = chart.options.scales.x.pts;
+        for (let k = 0; k < pts; ++k) {
+          let t = k / (pts-1);
+          data.labels.push((1-t)*xmin + t*xmax);
+        }
+        
+        // graph functions
+        console.log(data.datasets.length);
+        for (let n = 0; n < data.datasets.length; ++n) {
+          let fn = data.datasets[n].function;
+          let params = data.datasets[n].params;
+          for (let k = 0; k < data.labels.length; ++k) {
+            data.datasets[n].data.push(fn(data.labels[k], params));
+          }
+          console.log(data.datasets[n].data);
+        }
+      }
+    };
+    
+    // plot data and options
+    const normConst = 1 / Math.sqrt(2*Math.PI);
+    var coalescenceData = {
+      labels: [],
+      datasets: [
+        {
+          label: "Coalescence time distribution",
+          function: function(x, r) {
+            let u = 2*x / (r*r);
+            if (u < 1e-6) return 0;
+            else return normConst * r * Math.pow(x, -1.5) * Math.exp(-1/u);
+          },
+          params: 5,
+          data: [],
+          borderColor: '#276b40',
+          fill: false
+        }
+      ]
+    };
+    let coalescenceOptions = {
+      scales: {
+        x: {
+          min: 0,
+          max: 40,
+          pts: 100
+        },
+        y: {
+          min: 0,
+          max: 0.02
+        }
+      }
+    };
+    
+    let context = document.getElementById('plotCanvas');
+    var coalescencePlot = new Chart(context, {
+      type: 'line',
+      data: coalescenceData,
+      options: coalescenceOptions,
+      plugins: [plotter]
+    });
+    console.log('done script');
+  </script>
+</body>
+</html>

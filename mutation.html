@@ -33,14 +33,14 @@
   </div>
   <div id="wrapper">
     <div>
-      <p>Cells come in two colors: black and white. Each new cell inherits its ancestor&rsquo;s color&mdash;unless a mutation flips it. Use the slider below to vary the mutation rate. On this page, you can also click a column to mutate the next cell born there.</p>
+      <p>Cells come in two colors: black and white. Each new cell inherits its ancestor&rsquo;s color&mdash;unless a mutation flips it. Use the slider below to vary the mutation rate. On this page, you can induce a mutation by clicking below the family tree.</p>
       <div class="slider-box" style="margin-top: 20px">
         <input type="range" id="mutationRate" min="0" max="6" value="0" oninput="inputMutationRate();"/>
         <label for="mutationRate">Mutation rate:</label>
         <span id="mutationRateDisp"></span>
       </div>
     </div>
-    <div id="thicket"></div>
+    <div id="thicket" clickaction="mutate"></div>
   </div>
   <script>
     let coinSeries = [0, 1e-3, 2e-3, 5e-3, 1e-2, 2e-2, 5e-2];

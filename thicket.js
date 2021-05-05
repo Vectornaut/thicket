@@ -11,9 +11,10 @@ let nGens;
 let hSep;
 let vSep;
 
-// mutation rate
+// mutations
 let mutationRate_base;
 let mutationRate;
+let mutationRequests = null;
 
 // under the saving throw mechanism, only the first `waist` cells from either
 // edge are allowed to become empty
@@ -66,19 +67,18 @@ function decideScrollBorders() {
   canvasParent.style.borderRightColor = canvasParent.style.borderLeftColor;
 }
 
-function readParam(name, defaultValue) {
+function readParam(name, defaultValue, nonNumerical) {
   if (canvasParent.hasAttribute(name)) {
-    return Number(canvasParent.getAttribute(name));
+    if (nonNumerical) return canvasParent.getAttribute(name);
+    else return Number(canvasParent.getAttribute(name));
   } else {
     return defaultValue;
   }
 }
 
 function setMutationRate(newRate) {
-  console.log('before set: ', mutationRate_base, mutationRate);
   if (newRate != undefined) mutationRate_base = newRate;
   if (scale != undefined) mutationRate = mutationRate_base/(scale*scale);
-  console.log('after set: ', mutationRate_base, mutationRate);
 }
 
 function setParams() {
@@ -88,9 +88,12 @@ function setParams() {
   waist = scale*waist_base;
   
   // set mutation rate
-  console.log(mutationRate_base, mutationRate);
   if (mutationRate_base == undefined) setMutationRate(readParam('mutation_rate', 1e-3));
   else setMutationRate();
+  if (clickAction == 'mutate') {
+    mutationRequests = Array(pop);
+    for (let k = 0; k < pop; ++k) mutationRequests[k] = false;
+  }
   
   // set spacing
   hSep = round(hSep_base/scale);
@@ -178,7 +181,7 @@ function setup() {
   hSep_base = readParam('hsep', 8);
   waist_base = readParam('waist', 50);
   scale = readParam('scale', 1);
-  clickAction = readParam('clickaction', 'none');
+  clickAction = readParam('clickaction', 'none', true);
   
   // set parameters
   setParams();
@@ -278,9 +281,11 @@ function mouseClicked() {
     // map click to site
     let n = min(nGens, round((mouseY + lift + scrolled)/vSep + 0.5));
     let hShift = (n - nGens) % 2 ? 1-shift : shift;
-    let k = max(0, min(pop-1, round(mouseX/hSep - 0.5*hShift - 0.5)));
+    let k = round(mouseX/hSep - 0.5*hShift - 0.5);
     
+    console.log('click in bounds. click action: ', clickAction);
     if (clickAction == 'lineage' && presentSources != null) {
+      console.log('draw lineage');
       if (keyIsDown(SHIFT)) {
         // clear lineages and traces
         for (let n = 0; n < nGens; ++n) {
@@ -290,14 +295,16 @@ function mouseClicked() {
         for (let k = 0; k < pop; ++k) presentTraces[k] = false;
       } else {
         // draw lineage
-        if (n >= nGens && presentSources[k] < 0) {
-          presentSources[k] = requested;
-        } else {
-          drawLineage(k, n);
+        if (0 <= k && k < pop) {
+          if (n >= nGens && presentSources[k] < 0) {
+            presentSources[k] = requested;
+          } else {
+            drawLineage(k, n);
+          }
         }
       }
-    } else if (clickAction == 'mutate') {
-      i
+    } else if (clickAction == 'mutate' && n >= nGens) {
+      mutationRequests[k] = true;
     }
   }
 }
@@ -334,8 +341,8 @@ function advanceBuffers() {
   }
 }
 
-function varyColor(c) {
-  if (random() < mutationRate) {
+function varyColor(c, takeRequest) {
+  if (random() < mutationRate || takeRequest) {
     return c == dark ? light : dark;
   } else {
     return c;
@@ -371,7 +378,9 @@ function drawChildren(until) {
     if (ancestors[src] == empty) {
       children[next] = empty;
     } else {
-      children[next] = varyColor(ancestors[src]);
+      let takeRequest = false;
+      if (mutationRequests != null) takeRequest = mutationRequests[next];
+      children[next] = varyColor(ancestors[src], takeRequest);
       bicolorLine(
         hSep*(next + 0.5*shift + 0.5), vSep*1.5, lerpColor(children[next], bg, 0.65*(presentSources != null)),
         hSep*(src + 0.5*(1-shift) - 0.5), vSep*0.5, lerpColor(ancestors[src], bg, 0.65*(presentSources != null))
@@ -385,6 +394,9 @@ function drawChildren(until) {
       presentColors[next] = children[next];
       if (takeRequest) drawLineage(next);
     }
+    
+    // clear mutation request
+    mutationRequests[next] = false;
   }
 }
 

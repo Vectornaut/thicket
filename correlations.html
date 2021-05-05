@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+
+<!--
+  using Material dark theme palette recommendations
+  https://www.material.io/design/color/dark-theme.html
+-->
+
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <link rel="stylesheet" type="text/css" href="thicket.css" />
+  <style>
+    #wrapper {
+      max-width: 972px;
+      margin-right: 120px;
+    }
+  </style>
+  
+  <!-- MathJax -->
+  <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  
+  <!-- Plotly -->
+  <script>
+    window.PlotlyConfig = {MathJaxConfig: 'local'};
+  </script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+
+<body>
+  <div id="navbar">
+    <div class="title">Visualizing neutral theory</div>
+    <ul>
+      <li><a href="index.html">Title</a></li>
+      <li><a href="descent.html">Descent</a></li>
+      <li><a href="mutation.html">Mutation</a></li>
+      <li><a href="lineages.html">Lineages</a></li>
+      <li><a href="scaling.html">Scaling</a></li>
+      <li><a href="coalescence.html">Coalescence</a></li>
+      <li><a class="here" href="correlations.html">Correlations</a></li>
+      <li><a href="persistence.html">Persistence</a></li>
+      <li><a>...</a></li>
+    </ul>
+  </div>
+  <div id="wrapper">
+    <div>
+      <p>Nearby cells are more likely to have a recent common ancestor, so they're also more likely to be the same color. How likely, exactly? We can use the coalescence time distribution from the previous slide to figure it out.</p>
+      <p>Take two cells at distance \(r\) whose lineages meet time \(t\) ago. You can get from one cell to the other by climbing up to their common ancestor along one lineage and climbing back down along the other. The cells are the same color when this path goes through an even number of mutations. The path is \(2t\) time units long, so its probability of including an even number of mutations is
+        \[\begin{align}
+          P(r \mid t) = \left[1 + \frac{(\lambda\,2t)^2}{2!} + \frac{(\lambda\,2t)^4}{4!} + \frac{(\lambda\,2t)^6}{6!} + \ldots\right] e^{-\lambda\,2t}
+          & = \cosh(2\lambda t)\,e^{-2\lambda t} \\
+          & = \frac{1}{2}\left(1 + e^{-4\lambda t}\right),
+        \end{align}\]
+      where \(\lambda\) is the mutation rate per unit time.</p>
+      <p>If we don&rsquo;t know how long ago our cells&rsquo; lineages meet, we can average over all possible coalescence times to get the probability
+        \[ P(r) = \int_0^\infty P(r \mid t)\,\rho_\text{hit}(t)\;dt \]
+      that they're the same color. Surprisingly, this average has a simple closed-form expression.
+        \[ P(r) = \frac{1}{2}\left(1 + e^{-4r\sqrt{\lambda}}\right). \]
+      We find it by writing the integrand as
+        \[
+          \frac{C}{\sqrt{\pi}} e^{-C^2 u^2}\;du
+          + \frac{C}{\sqrt{\pi}} e^{-C^2(u^2 - u^{-2})}\;du,
+        \]
+      with \(C^2 = r\sqrt{\lambda}\) and \(C^2 u^2 = r^2/t\). The first term is a normal distribution, which integrates to 1/2. The second term has a surprising closed-form antiderivative,
+        \[ e^{-2C^2} \operatorname{erf}\bigl[C(u^{-1} - u)\bigr] - e^{2C^2} \operatorname{erf}\bigl[C(u^{-1} + u)\bigr], \]
+      which gives the exponential term in the probability formula.
+      </p>
+    </div>
+    <div>
+      <p id="corrPlot"></p>
+      <div class="slider-box">
+        <input type="range" id="mutationRate" min="0" max="5" value="3" oninput="updateCorrPlot()"/>
+        <label for="mutationRate">Mutation rate:</label>
+        <span id="mutationRateDisp"></span>
+      </div>
+    </div>
+  </div>
+  <script>
+    let rs = [];
+    let corrs = [];
+    let corrData = [
+      {
+        x: rs,
+        y: corrs,
+        mode: 'lines',
+        type: 'scatter',
+        line: {
+          color: '#276b40',
+          width: 3
+        },
+        fill: 'tonexty',
+        fillcolor: '#7fb88f'
+      }
+    ];
+    let layout = {
+      title: 'Probability of having the same color',
+      plot_bgcolor: '#c5ecce',
+      paper_bgcolor: '#c5ecce',
+      font: {
+        family: 'Arial, sans-serif',
+        color: 'black'
+      },
+      xaxis: {
+        title: 'Position difference',
+        zeroline: false,
+        showgrid: false,
+        range: [-6, 6]
+      },
+      yaxis: {
+        showgrid: false,
+        range: [-0.01, 1.02]
+      }
+    }
+    
+    // correlation function
+    function corr(r, mutationRate) {
+      return 0.5*(1 + Math.exp(-4*Math.sqrt(mutationRate)*Math.abs(r)));
+    }
+    
+    // generate time points
+    const normConst = 1 / Math.sqrt(Math.PI);
+    let max = 8;
+    let pts = 201;
+    for (let k = 0; k < pts; ++k) {
+      let u = 2*k / (pts-1) - 1;
+      let r = u*max;
+      rs.push(r);
+    }
+    
+    let coinSeries = [1e-3, 2e-3, 5e-3, 1e-2, 2e-2, 5e-2];
+    function updateCorrPlot(noRedraw) {
+      mutationRate = coinSeries[document.getElementById('mutationRate').value];
+      document.getElementById('mutationRateDisp').innerHTML = mutationRate;
+      for (let k = 0; k < rs.length; ++k) {
+        corrs[k] = corr(rs[k], mutationRate);
+      }
+      if (!noRedraw) Plotly.redraw('corrPlot');
+    }
+    
+    // generate and display probability density
+    updateCorrPlot(true);
+    Plotly.newPlot('corrPlot', corrData, layout);
+  </script>
+</body>
+</html>

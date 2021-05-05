@@ -38,8 +38,8 @@
       <li><a href="lineages.html">Lineages</a></li>
       <li><a href="scaling.html">Scaling</a></li>
       <li><a class="here" href="coalescence.html">Coalescence</a></li>
+      <li><a href="correlations.html">Correlations</a></li>
       <li><a href="persistence.html">Persistence</a></li>
-      <li><a href="correlation.html">Correlation</a></li>
       <li><a>...</a></li>
     </ul>
   </div>
@@ -47,7 +47,8 @@
     <div>
       <p>Take two cells in the present and follow their lineages back through time. There's a 100% chance that the lineages eventually meet at a common ancestor. How long ago does that happen?</p>
       <p>In the continuum limit, each lineage is a Brownian motion with variance 1/4 per unit time. The lineages stay independent until they meet, so their difference is a Brownian motion with variance 1/2 per unit time. We&rsquo;ve turned our question about common ancestors into a question about random walks: if a Brownian motion with variance 1/2 per unit time starts a distance \(r\) from zero, how long does it take to hit zero? The probability density of hitting zero at time \(t\) turns out to be
-      \[ \rho_\text{hit}(t) = \frac{r}{\sqrt{\pi}}\,t^{-3/2}\,e^{-r^2/t}. \]</p>
+        \[ \rho_\text{hit}(t) = \frac{r}{\sqrt{\pi}}\,t^{-3/2}\,e^{-r^2/t}. \]
+      </p>
     </div>
     <div>
       <p id="hitPlot"></p>
@@ -85,12 +86,10 @@
       },
       xaxis: {
         title: 'Time before present',
-        zeroline: true,
         showgrid: false,
         range: [-0.4, 40]
       },
       yaxis: {
-        zeroline: true,
         showgrid: false,
         range: [-0.001, 0.03]
       }
@@ -113,10 +112,6 @@
       ts.push(t);
     }
     
-    // generate and display probability density
-    updateHitPlot(true);
-    Plotly.newPlot('hitPlot', hitDensityData, layout);
-    
     function updateHitPlot(noRedraw) {
       r = document.getElementById('cellDist').value;
       document.getElementById('cellDistDisp').innerHTML = r;
@@ -125,6 +120,10 @@
       }
       if (!noRedraw) Plotly.redraw('hitPlot');
     }
+    
+    // generate and display probability density
+    updateHitPlot(true);
+    Plotly.newPlot('hitPlot', hitDensityData, layout);
   </script>
 </body>
 </html>

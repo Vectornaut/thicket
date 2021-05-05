@@ -49,7 +49,14 @@
       <p>In the continuum limit, each lineage is a Brownian motion with variance 1/4 per unit time. The lineages stay independent until they meet, so their difference is a Brownian motion with variance 1/2 per unit time. We&rsquo;ve turned our question about common ancestors into a question about random walks: if a Brownian motion with variance 1/2 per unit time starts a distance \(r\) from zero, how long does it take to hit zero? The probability density of hitting zero at time \(t\) turns out to be
       \[ \rho_\text{hit}(t) = \frac{r}{\sqrt{\pi}}\,t^{-3/2}\,e^{-r^2/t}. \]</p>
     </div>
-    <div id="hitPlot"></div>
+    <div>
+      <p id="hitPlot"></p>
+      <div class="slider-box">
+        <input type="range" id="cellDist" min="2" max="10" value="3" oninput="updateHitPlot()"/>
+        <label for="cellDist">Distance between cells:</label>
+        <span id="cellDistDisp"></span>
+      </div>
+    </div>
   </div>
   <script>
     let ts = [];
@@ -63,13 +70,19 @@
         line: {
           color: '#276b40',
           width: 3
-        }
+        },
+        fill: 'tonexty',
+        fillcolor: '#7fb88f'
       }
     ];
     let layout = {
       title: 'Coalescence probability',
       plot_bgcolor: '#c5ecce',
       paper_bgcolor: '#c5ecce',
+      font: {
+        family: 'Arial, sans-serif',
+        color: 'black'
+      },
       xaxis: {
         title: 'Time before present',
         zeroline: true,
@@ -79,30 +92,39 @@
       yaxis: {
         zeroline: true,
         showgrid: false,
-        range: [-0.001, 0.01]
+        range: [-0.001, 0.03]
       }
     }
     
     // coalescence time density function
-    function hitDensity(t) {
+    function hitDensity(t, r) {
       let diffusion = t/(r*r);
       if (diffusion < 1e-6) return 0;
       else return normConst * r * Math.pow(t, -1.5) * Math.exp(-1/diffusion);
     }
     
-    // generate plot data
+    // generate time points
     const normConst = 1 / Math.sqrt(Math.PI);
-    let r = 5;
     let max = 100;
-    let pts = 200;
+    let pts = 300;
     for (let k = 0; k < pts; ++k) {
       let u = k / (pts-1);
-      let t = 0.5*u*(1+u)*max;
+      let t = u*(0.1+0.9*u)*max;
       ts.push(t);
-      rhos.push(hitDensity(t));
     }
     
+    // generate and display probability density
+    updateHitPlot(true);
     Plotly.newPlot('hitPlot', hitDensityData, layout);
+    
+    function updateHitPlot(noRedraw) {
+      r = document.getElementById('cellDist').value;
+      document.getElementById('cellDistDisp').innerHTML = r;
+      for (let k = 0; k < ts.length; ++k) {
+        rhos[k] = hitDensity(ts[k], r);
+      }
+      if (!noRedraw) Plotly.redraw('hitPlot');
+    }
   </script>
 </body>
 </html>

@@ -12,6 +12,7 @@ let hSep;
 let vSep;
 
 // mutation rate
+let mutationRate_base;
 let mutationRate;
 
 // under the saving throw mechanism, only the first `waist` cells from either
@@ -52,8 +53,9 @@ let dark;
 let light;
 let empty;
 
-// container
+// container and interaction
 let canvasParent;
+let clickAction;
 
 function decideScrollBorders() {
   if (canvasParent.scrollWidth > canvasParent.clientWidth) {
@@ -72,8 +74,11 @@ function readParam(name, defaultValue) {
   }
 }
 
-function setMutationRate(mutationRate_base) {
-  mutationRate = mutationRate_base/(scale*scale);
+function setMutationRate(newRate) {
+  console.log('before set: ', mutationRate_base, mutationRate);
+  if (newRate != undefined) mutationRate_base = newRate;
+  if (scale != undefined) mutationRate = mutationRate_base/(scale*scale);
+  console.log('after set: ', mutationRate_base, mutationRate);
 }
 
 function setParams() {
@@ -83,7 +88,9 @@ function setParams() {
   waist = scale*waist_base;
   
   // set mutation rate
-  setMutationRate(readParam('mutation_rate', 1e-3));
+  console.log(mutationRate_base, mutationRate);
+  if (mutationRate_base == undefined) setMutationRate(readParam('mutation_rate', 1e-3));
+  else setMutationRate();
   
   // set spacing
   hSep = round(hSep_base/scale);
@@ -171,6 +178,7 @@ function setup() {
   hSep_base = readParam('hsep', 8);
   waist_base = readParam('waist', 50);
   scale = readParam('scale', 1);
+  clickAction = readParam('clickaction', 'none');
   
   // set parameters
   setParams();
@@ -266,26 +274,30 @@ function draw() {
 }
 
 function mouseClicked() {
-  if (presentSources != null && 0 <= mouseY && 0 <= mouseX && mouseX < width) {
-    if (keyIsDown(SHIFT)) {
-      // clear lineages and traces
-      for (let n = 0; n < nGens; ++n) {
-        lineage[n].clear();
-        for (let k = 0; k < pop; ++k) pastTraces[n][k] = false;
-      }
-      for (let k = 0; k < pop; ++k) presentTraces[k] = false;
-    } else {
-      // draw lineage
-      let n = min(nGens, round((mouseY + lift + scrolled)/vSep + 0.5));
-      let hShift = (n - nGens) % 2 ? 1-shift : shift;
-      let head = round(mouseX/hSep - 0.5*hShift - 0.5);
-      if (0 <= head && head < pop) {
-        if (n >= nGens && presentSources[head] < 0) {
-          presentSources[head] = requested;
+  if (0 <= mouseY && 0 <= mouseX && mouseX < width) {
+    // map click to site
+    let n = min(nGens, round((mouseY + lift + scrolled)/vSep + 0.5));
+    let hShift = (n - nGens) % 2 ? 1-shift : shift;
+    let k = max(0, min(pop-1, round(mouseX/hSep - 0.5*hShift - 0.5)));
+    
+    if (clickAction == 'lineage' && presentSources != null) {
+      if (keyIsDown(SHIFT)) {
+        // clear lineages and traces
+        for (let n = 0; n < nGens; ++n) {
+          lineage[n].clear();
+          for (let k = 0; k < pop; ++k) pastTraces[n][k] = false;
+        }
+        for (let k = 0; k < pop; ++k) presentTraces[k] = false;
+      } else {
+        // draw lineage
+        if (n >= nGens && presentSources[k] < 0) {
+          presentSources[k] = requested;
         } else {
-          drawLineage(head, n);
+          drawLineage(k, n);
         }
       }
+    } else if (clickAction == 'mutate') {
+      i
     }
   }
 }

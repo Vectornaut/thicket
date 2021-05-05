@@ -396,7 +396,7 @@ function drawChildren(until) {
     }
     
     // clear mutation request
-    mutationRequests[next] = false;
+    if (mutationRequests != null) mutationRequests[next] = false;
   }
 }
 

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+
+<!--
+  using Material dark theme palette recommendations
+  https://www.material.io/design/color/dark-theme.html
+-->
+
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <link rel="stylesheet" type="text/css" href="thicket.css" />
+  <style>
+    #wrapper {
+      max-width: 972px;
+      margin-right: 120px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="navbar">
+    <div class="title">Visualizing neutral theory</div>
+    <ul>
+      <li><a href="index.html">Title</a></li>
+      <li><a href="descent.html">Descent</a></li>
+      <li><a href="mutation.html">Mutation</a></li>
+      <li><a class="here" href="context.html">Context</a></li>
+      <li><a href="lineages.html">Lineages</a></li>
+      <li><a href="scaling.html">Scaling</a></li>
+      <li><a href="coalescence.html">Coalescence</a></li>
+      <li><a href="correlations.html">Correlations</a></li>
+      <li><a href="persistence.html">Persistence</a></li>
+      <li><a>...</a></li>
+    </ul>
+  </div>
+  <div id="wrapper">
+    <div>
+      <p>
+        This random process is an example of a <i>voter model</i>. Although they get their name from applications in opinion dynamics, voter models first appeared (as far as I&rsquo;ve heard) in ecology.
+        <ul>
+          <li>C. Castellano, S. Fortunato, and V. Loreto. Statistical physics of social dynamics. <i>Reviews of Modern Physics</i> (2009). <a href="https://doi.org/10.1103/RevModPhys.81.591"><tt>doi:10.1103/RevModPhys.81.591</tt></a></li>
+          <li>P. Clifford and A. Sudbury. A Model for Spatial Conflict. <i>Biometrika</i> (1973). <a href="https://doi.org/10.2307/2335008"><tt>doi:10.2307/2335008</tt></a></li>
+        </ul>
+        To see these models&rsquo; ecological motivation, think about trees in a forest, scattering seeds around themselves. In the gap between a chestnut, an oak, and a pine, seeds of all three species are trying to sprout; one of them, at random, will succeed. Each tree you see growing in the present descends from one of its neighbors in the past.
+      </p>
+      <p>
+        Seeds don&rsquo;t really stay right next to their parent trees, but they are limited in how far they can disperse from one generation to the next. The same goes for many kinds of organisms. This gives voter models a place in the study of real ecosystems. Voter models also appear in population genetics and linguistics&mdash;other fields where people want to understand how variation spreads.
+        <ul>
+          <li>S. Pigolotti, M. Cencini, D. Molina, and M. A. Mu&ntilde;oz. Stochastic Spatial Models in Ecology: A Statistical Physics Approach. <i>Journal of Statistical Physics</i> (2018). <a href="https://doi.org/10.1007/s10955-017-1926-4"><tt>doi:10.1007/s10955-017-1926-4</tt></a>
+        </ul>
+      </p>
+      <p>
+        As we&rsquo;ll see today, even the simplest voter models can produce intricate patterns of diversity in space and time. They illustrate some basic ideas of <i>neutral theory</i>, which describes the parts of evolution and ecology where patterns form without selective pressure.
+      </p>
+    </div>
+  </div>
+</body>
+</html>

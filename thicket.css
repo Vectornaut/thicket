@@ -79,7 +79,7 @@ p {
   margin-bottom: 60px;
 }
 
-#wrapper > div:not(#thicket) {
+#wrapper > div:not(#thicket, #clade-walk) {
   padding: 15px;
   border-radius: 15px;
   background-color: #c5ecce;
@@ -95,6 +95,30 @@ p {
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
   background-color: inherit;
+}
+
+#clade-walk {
+  display: grid;
+  justify-items: center;
+  grid-template-rows: repeat(3, 1fr);
+  grid-template-columns: repeat(3, 1fr);
+  grid-row-gap: 20px;
+  grid-column-gap: 30px;
+  padding-left: 15px;
+  padding-right: 15px;
+  overflow-x: auto;
+  background-color: inherit;
+}
+
+#clade-walk > div {
+  margin: 0;
+  white-space: nowrap;
+}
+
+#clade-walk > .caption {
+  padding: 15px;
+  border-radius: 15px;
+  background-color: #c5ecce;
 }
 
 /* controls */

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+
+<!--
+  using Material dark theme palette recommendations
+  https://www.material.io/design/color/dark-theme.html
+-->
+
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <link rel="stylesheet" type="text/css" href="thicket.css" />
+  <style>
+    #wrapper {
+      max-width: 972px;
+      margin-right: 120px;
+    }
+  </style>
+  
+  <!-- MathJax -->
+  <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
+<body>
+  <div id="navbar">
+    <div class="title">Visualizing neutral theory</div>
+    <ul>
+      <li><a href="index.html">Title</a></li>
+      <li><a href="descent.html">Descent</a></li>
+      <li><a href="mutation.html">Mutation</a></li>
+      <li><a href="context.html">Context</a></li>
+      <li><a href="lineages.html">Lineages</a></li>
+      <li><a href="scaling.html">Scaling</a></li>
+      <li><a href="coalescence.html">Coalescence</a></li>
+      <li><a href="correlations.html">Correlations</a></li>
+      <li><a class="here" href="persistence.html">Persistence</a></li>
+      <li><a>...</a></li>
+    </ul>
+  </div>
+  <div id="wrapper">
+    <div>
+      <p>How long do clades last? Can they last forever? In 1d, we can answer these questions by focusing on a clade&rsquo;s endpoints.</p>
+      <p>Cells born between the endpoints will always descend from the clade. Cells born just outside the endpoints have equal odds of descending from the clade or not. As a result, the endpoints each follow a random walk forward in time.</p>
+      <p>Each generation, the clade shrinks if both endpoints move inward, and grows if both endpoints move outward.</p>
+    </div>
+    <div id="clade-walk">
+      <div></div>
+      <div><img src="clade-left.png" /></div>
+      <div></div>
+      <div><img src="clade-shrink.png" /></div>
+      <div><img src="clade-right.png" /></div>
+      <div><img src="clade-grow.png" /></div>
+      <div class="caption">1/4 chance of losing one</div>
+      <div class="caption">2/4 chance of no change</div>
+      <div class="caption">1/4 chance of gaining one</div>
+    </div>
+    <div>
+      <p>In the continuum limit, the endpoints follow Brownian motions with variance 1/4 per unit time. Hence, the size of the clade follows a Brownian motion with variance 1/2 per unit time.</p>
+      <p>That means the clade&rsquo;s future persistence time has the same distribution as the endpoints&rsquo; coalescence time&mdash;the hitting time distribution \(\rho^\text{hit}_r\). Keep in mind, however, that the clade will often be much older than its endpoints&rsquo; last common ancestor!
+  </div>
+</body>
+</html>

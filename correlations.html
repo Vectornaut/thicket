@@ -74,7 +74,7 @@
       We find our formula for \(F(r)\) by writing the integrand as
         \[
           \frac{C}{\sqrt{\pi}} e^{-C^2 u^2}\;du
-          + \frac{C}{\sqrt{\pi}} e^{-C^2(u^2 - u^{-2})}\;du,
+          + \frac{C}{\sqrt{\pi}} e^{-C^2(u^2 + u^{-2})}\;du,
         \]
       with \(C^2 = 2r\sqrt{\lambda}\) and \(C^2 u^2 = r^2/t\). The first term is a normal distribution, which integrates to 1/2. The second term has a surprising closed-form antiderivative,
         \[ e^{-2C^2} \operatorname{erf}\bigl[C(u^{-1} - u)\bigr] - e^{2C^2} \operatorname{erf}\bigl[C(u^{-1} + u)\bigr], \]
